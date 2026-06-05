@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Comptage vigne">
+<title>Comptage vigne</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background:#f6f7f8;
+  color:#111827;
+  padding:14px;
+  padding-bottom:34px;
+}
+h1 { text-align:center; font-size:24px; margin:8px 0 12px; }
+.card,.counter {
+  background:#fff;
+  border:1px solid #d1d5db;
+  border-radius:18px;
+  padding:14px;
+  margin-bottom:14px;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);
+}
+label { display:block; font-weight:800; margin-bottom:6px; font-size:15px; }
+select,input,textarea {
+  width:100%;
+  font-size:18px;
+  padding:14px;
+  border:1px solid #d1d5db;
+  border-radius:14px;
+  background:#fff;
+}
+textarea { min-height:72px; resize:vertical; }
+.small { color:#6b7280; font-size:13px; margin-top:6px; }
+.check-grid { display:grid; grid-template-columns:1fr; gap:8px; }
+.check-item {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:#f9fafb;
+  border:1px solid #d1d5db;
+  border-radius:14px;
+  padding:12px;
+  font-weight:800;
+}
+.check-item input { width:24px; height:24px; padding:0; }
+.counter { display:none; }
+.counter.active { display:block; }
+.counter-title { font-weight:900; font-size:19px; margin-bottom:10px; }
+.counter-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; align-items:center; }
+button {
+  border:0;
+  border-radius:16px;
+  font-size:30px;
+  font-weight:900;
+  min-height:76px;
+  background:#111827;
+  color:white;
+  touch-action:manipulation;
+}
+button.minus { background:#374151; }
+button.secondary { background:#4b5563; font-size:18px; min-height:56px; margin-top:10px; width:100%; }
+.value {
+  text-align:center;
+  font-size:44px;
+  font-weight:900;
+  line-height:76px;
+  background:#f3f4f6;
+  border-radius:16px;
+  min-height:76px;
+}
+
+.saved-list {
+  max-height:260px;
+  overflow:auto;
+  border:1px solid #d1d5db;
+  border-radius:14px;
+  background:#f9fafb;
+  padding:8px;
+}
+.saved-item {
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:12px;
+  padding:10px;
+  margin-bottom:8px;
+  font-size:14px;
+}
+.saved-item strong { font-size:15px; }
+.saved-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px; }
+.save { background:#1d4ed8; }
+.danger-small { background:#991b1b; font-size:16px; min-height:52px; }
+.info { background:#0369a1; font-size:16px; min-height:52px; }
+
+.actions {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+  position:sticky;
+  bottom:10px;
+  z-index:5;
+}
+.export { background:#166534; }
+.reset { background:#b91c1c; }
+@media (min-width:700px) { body { max-width:620px; margin:auto; } }
+</style>
+</head>
+<body>
+<h1>Comptage vigne</h1>
+
+<div class="card">
+  <label for="parcelle">ID_parcelle</label>
+  <select id="parcelle">
+    <option value="artigues_centre_1">artigues_centre_1</option>
+<option value="artigues_centre_2">artigues_centre_2</option>
+<option value="artigues_centre_3">artigues_centre_3</option>
+<option value="artigues_centre_4">artigues_centre_4</option>
+<option value="artigues_centre_5">artigues_centre_5</option>
+<option value="artigues_la_gravette">artigues_la_gravette</option>
+<option value="artigues_le_bois_1">artigues_le_bois_1</option>
+<option value="artigues_le_bois_2">artigues_le_bois_2</option>
+<option value="artigues_le_bois_3">artigues_le_bois_3</option>
+<option value="artigues_le_bois_4">artigues_le_bois_4</option>
+<option value="artigues_le_bois_5">artigues_le_bois_5</option>
+<option value="artigues_le_bois_6">artigues_le_bois_6</option>
+<option value="artigues_les_chevres_1">artigues_les_chevres_1</option>
+<option value="artigues_les_chevres_2">artigues_les_chevres_2</option>
+<option value="artigues_les_chevres_3">artigues_les_chevres_3</option>
+<option value="artigues_planteyrot_1">artigues_planteyrot_1</option>
+<option value="artigues_planteyrot_2">artigues_planteyrot_2</option>
+<option value="artigues_planteyrot_3">artigues_planteyrot_3</option>
+<option value="artigues_roseaux">artigues_roseaux</option>
+<option value="artigues_triau_bas_2">artigues_triau_bas_2</option>
+<option value="artigues_triau_haut_1">artigues_triau_haut_1</option>
+<option value="artigues_virage">artigues_virage</option>
+<option value="berret_1">berret_1</option>
+<option value="berret_2">berret_2</option>
+<option value="berret_3">berret_3</option>
+<option value="bois_de_la_tour">bois_de_la_tour</option>
+<option value="canaires">canaires</option>
+<option value="canterane">canterane</option>
+<option value="chais_1">chais_1</option>
+<option value="chais_2">chais_2</option>
+<option value="chataigniers">chataigniers</option>
+<option value="chene_vert_1">chene_vert_1</option>
+<option value="chene_vert_2">chene_vert_2</option>
+<option value="chene_vert_3">chene_vert_3</option>
+<option value="dardenans_1">dardenans_1</option>
+<option value="dardenans_2">dardenans_2</option>
+<option value="dardenans_3">dardenans_3</option>
+<option value="fiouzaille">fiouzaille</option>
+<option value="font_de_jeanne_CS">font_de_jeanne_CS</option>
+<option value="font_de_jeanne_M">font_de_jeanne_M</option>
+<option value="font_de_jeanne_PV">font_de_jeanne_PV</option>
+<option value="forts_de_latour_CS_nord">forts_de_latour_CS_nord</option>
+<option value="forts_de_latour_CS_sud">forts_de_latour_CS_sud</option>
+<option value="forts_de_latour_M">forts_de_latour_M</option>
+<option value="forts_de_latour_PV">forts_de_latour_PV</option>
+<option value="gaillottes_1">gaillottes_1</option>
+<option value="gaillottes_2">gaillottes_2</option>
+<option value="gaillottes_3">gaillottes_3</option>
+<option value="gaillottes_4">gaillottes_4</option>
+<option value="gaillottes_5">gaillottes_5</option>
+<option value="gaillottes_6">gaillottes_6</option>
+<option value="gaillottes_7">gaillottes_7</option>
+<option value="garennes_1">garennes_1</option>
+<option value="garennes_2">garennes_2</option>
+<option value="grand_enclos">grand_enclos</option>
+<option value="grand_faure_1">grand_faure_1</option>
+<option value="grand_faure_2">grand_faure_2</option>
+<option value="grand_sablonnet_1">grand_sablonnet_1</option>
+<option value="grand_sablonnet_2_collection">grand_sablonnet_2_collection</option>
+<option value="grand_sablonnet_2_sud">grand_sablonnet_2_sud</option>
+<option value="grande_lande_1">grande_lande_1</option>
+<option value="grande_lande_2">grande_lande_2</option>
+<option value="grande_lande_3">grande_lande_3</option>
+<option value="gravette">gravette</option>
+<option value="jardin_(trillot)">jardin_(trillot)</option>
+<option value="jardinots_1">jardinots_1</option>
+<option value="jardinots_2">jardinots_2</option>
+<option value="juillac_1">juillac_1</option>
+<option value="juillac_2_CS">juillac_2_CS</option>
+<option value="juillac_2_M">juillac_2_M</option>
+<option value="la_glodoune">la_glodoune</option>
+<option value="la_lagune_CS">la_lagune_CS</option>
+<option value="la_lagune_M">la_lagune_M</option>
+<option value="les_gressons_3">les_gressons_3</option>
+<option value="les_gressons_4">les_gressons_4</option>
+<option value="les_gressons_m">les_gressons_m</option>
+<option value="les_parcs_CS">les_parcs_CS</option>
+<option value="les_parcs_M">les_parcs_M</option>
+<option value="lespret">lespret</option>
+<option value="merlots_en_mélange">merlots_en_mélange</option>
+<option value="moussas">moussas</option>
+<option value="parc_de_pelon">parc_de_pelon</option>
+<option value="parcelle_de_la_palu_(hors_aoc)">parcelle_de_la_palu_(hors_aoc)</option>
+<option value="petit_batailley_1_CS">petit_batailley_1_CS</option>
+<option value="petit_batailley_1_M">petit_batailley_1_M</option>
+<option value="petit_batailley_2">petit_batailley_2</option>
+<option value="petit_batailley_2_bis">petit_batailley_2_bis</option>
+<option value="petit_batailley_3">petit_batailley_3</option>
+<option value="petit_batailley_4">petit_batailley_4</option>
+<option value="petit_batailley_5">petit_batailley_5</option>
+<option value="petit_batailley_6">petit_batailley_6</option>
+<option value="petit_batailley_7">petit_batailley_7</option>
+<option value="petit_batailley_8">petit_batailley_8</option>
+<option value="petit_faure_1_CS_nord">petit_faure_1_CS_nord</option>
+<option value="petit_faure_1_CS_sud">petit_faure_1_CS_sud</option>
+<option value="petit_faure_1_M">petit_faure_1_M</option>
+<option value="petit_faure_2_CS_nord">petit_faure_2_CS_nord</option>
+<option value="petit_faure_2_CS_sud">petit_faure_2_CS_sud</option>
+<option value="petit_faure_2_M">petit_faure_2_M</option>
+<option value="petit_faure_3">petit_faure_3</option>
+<option value="petit_sablonnet">petit_sablonnet</option>
+<option value="petits_pieds_cs">petits_pieds_cs</option>
+<option value="petits_pieds_merlots">petits_pieds_merlots</option>
+<option value="pibran_1">pibran_1</option>
+<option value="pibran_2">pibran_2</option>
+<option value="piece_de_la_tour">piece_de_la_tour</option>
+<option value="piece_du_chateau">piece_du_chateau</option>
+<option value="pinada_1">pinada_1</option>
+<option value="pinada_2">pinada_2</option>
+<option value="pinada_3">pinada_3</option>
+<option value="plantier_blanc_CS">plantier_blanc_CS</option>
+<option value="plantier_blanc_PV">plantier_blanc_PV</option>
+<option value="plantier_comtesse">plantier_comtesse</option>
+<option value="pommiers">pommiers</option>
+<option value="prairie_CS">prairie_CS</option>
+<option value="prairie_M">prairie_M</option>
+<option value="roca_1">roca_1</option>
+<option value="roca_2">roca_2</option>
+<option value="roca_3">roca_3</option>
+<option value="roca_4">roca_4</option>
+<option value="rodites_1">rodites_1</option>
+<option value="rodites_2_CS">rodites_2_CS</option>
+<option value="rodites_2_M">rodites_2_M</option>
+<option value="saint_anne_1">saint_anne_1</option>
+<option value="saint_anne_2">saint_anne_2</option>
+<option value="saint_anne_3">saint_anne_3</option>
+<option value="saint_anne_3_plante">saint_anne_3_plante</option>
+<option value="saint_anne_4">saint_anne_4</option>
+<option value="saint_anne_5">saint_anne_5</option>
+<option value="saint_anne_6">saint_anne_6</option>
+<option value="sarmentier">sarmentier</option>
+<option value="saucina">saucina</option>
+<option value="socs_1_CS">socs_1_CS</option>
+<option value="socs_1_M">socs_1_M</option>
+<option value="socs_2">socs_2</option>
+<option value="socs_3">socs_3</option>
+<option value="terre_noire">terre_noire</option>
+<option value="tourette_1">tourette_1</option>
+<option value="tourette_2">tourette_2</option>
+<option value="tourette_3">tourette_3</option>
+<option value="tourette_4">tourette_4</option>
+<option value="trillot_1">trillot_1</option>
+<option value="trillot_2">trillot_2</option>
+<option value="trillot_2_jeunes_pieds">trillot_2_jeunes_pieds</option>
+<option value="trillot_3">trillot_3</option>
+<option value="trillot_4">trillot_4</option>
+  </select>
+  <div class="small">146 parcelles intégrées dans le fichier.</div>
+</div>
+
+<div class="card">
+  <label for="rang">Rang / secteur</label>
+  <input id="rang" type="text" placeholder="Ex : rang 8, zone nord...">
+</div>
+
+<div class="card">
+  <label>Compteurs à afficher</label>
+  <div class="check-grid">
+    <label class="check-item">
+      <input type="checkbox" class="cat-check" data-cat="Manquants" checked onchange="toggleCounter('Manquants', this.checked)">
+      <span>Manquants</span>
+    </label>
+<label class="check-item">
+      <input type="checkbox" class="cat-check" data-cat="Complants" checked onchange="toggleCounter('Complants', this.checked)">
+      <span>Complants</span>
+    </label>
+<label class="check-item">
+      <input type="checkbox" class="cat-check" data-cat="Manchots" checked onchange="toggleCounter('Manchots', this.checked)">
+      <span>Manchots</span>
+    </label>
+<label class="check-item">
+      <input type="checkbox" class="cat-check" data-cat="Manchots avec pampres (pied en reconstruction)" checked onchange="toggleCounter('Manchots_avec_pampres_pied_en_reconstruction', this.checked)">
+      <span>Manchots avec pampres (pied en reconstruction)</span>
+    </label>
+<label class="check-item">
+      <input type="checkbox" class="cat-check" data-cat="Peu_productif" checked onchange="toggleCounter('Peu_productif', this.checked)">
+      <span>Peu_productif</span>
+    </label>
+<label class="check-item">
+      <input type="checkbox" class="cat-check" data-cat="Improductif" checked onchange="toggleCounter('Improductif', this.checked)">
+      <span>Improductif</span>
+    </label>
+<label class="check-item">
+      <input type="checkbox" class="cat-check" data-cat="Esca" checked onchange="toggleCounter('Esca', this.checked)">
+      <span>Esca</span>
+    </label>
+<label class="check-item">
+      <input type="checkbox" class="cat-check" data-cat="Eutypiose" checked onchange="toggleCounter('Eutypiose', this.checked)">
+      <span>Eutypiose</span>
+    </label>
+<label class="check-item">
+      <input type="checkbox" class="cat-check" data-cat="Court_noué" checked onchange="toggleCounter('Court_noue', this.checked)">
+      <span>Court_noué</span>
+    </label>
+<label class="check-item">
+      <input type="checkbox" class="cat-check" data-cat="Cépages_différents" checked onchange="toggleCounter('Cepages_differents', this.checked)">
+      <span>Cépages_différents</span>
+    </label>
+  </div>
+  <button type="button" class="secondary" onclick="showAllCounters()">Tout afficher</button>
+</div>
+
+<div id="counters">
+  <div class="counter active" id="counter_Manquants" data-cat="Manquants">
+      <div class="counter-title">Manquants</div>
+      <div class="counter-row">
+        <button class="minus" type="button" onclick="changeCount('Manquants', -1)">−</button>
+        <div class="value" id="value_Manquants">0</div>
+        <button type="button" onclick="changeCount('Manquants', 1)">+</button>
+      </div>
+    </div>
+<div class="counter active" id="counter_Complants" data-cat="Complants">
+      <div class="counter-title">Complants</div>
+      <div class="counter-row">
+        <button class="minus" type="button" onclick="changeCount('Complants', -1)">−</button>
+        <div class="value" id="value_Complants">0</div>
+        <button type="button" onclick="changeCount('Complants', 1)">+</button>
+      </div>
+    </div>
+<div class="counter active" id="counter_Manchots" data-cat="Manchots">
+      <div class="counter-title">Manchots</div>
+      <div class="counter-row">
+        <button class="minus" type="button" onclick="changeCount('Manchots', -1)">−</button>
+        <div class="value" id="value_Manchots">0</div>
+        <button type="button" onclick="changeCount('Manchots', 1)">+</button>
+      </div>
+    </div>
+<div class="counter active" id="counter_Manchots_avec_pampres_pied_en_reconstruction" data-cat="Manchots avec pampres (pied en reconstruction)">
+      <div class="counter-title">Manchots avec pampres (pied en reconstruction)</div>
+      <div class="counter-row">
+        <button class="minus" type="button" onclick="changeCount('Manchots_avec_pampres_pied_en_reconstruction', -1)">−</button>
+        <div class="value" id="value_Manchots_avec_pampres_pied_en_reconstruction">0</div>
+        <button type="button" onclick="changeCount('Manchots_avec_pampres_pied_en_reconstruction', 1)">+</button>
+      </div>
+    </div>
+<div class="counter active" id="counter_Peu_productif" data-cat="Peu_productif">
+      <div class="counter-title">Peu_productif</div>
+      <div class="counter-row">
+        <button class="minus" type="button" onclick="changeCount('Peu_productif', -1)">−</button>
+        <div class="value" id="value_Peu_productif">0</div>
+        <button type="button" onclick="changeCount('Peu_productif', 1)">+</button>
+      </div>
+    </div>
+<div class="counter active" id="counter_Improductif" data-cat="Improductif">
+      <div class="counter-title">Improductif</div>
+      <div class="counter-row">
+        <button class="minus" type="button" onclick="changeCount('Improductif', -1)">−</button>
+        <div class="value" id="value_Improductif">0</div>
+        <button type="button" onclick="changeCount('Improductif', 1)">+</button>
+      </div>
+    </div>
+<div class="counter active" id="counter_Esca" data-cat="Esca">
+      <div class="counter-title">Esca</div>
+      <div class="counter-row">
+        <button class="minus" type="button" onclick="changeCount('Esca', -1)">−</button>
+        <div class="value" id="value_Esca">0</div>
+        <button type="button" onclick="changeCount('Esca', 1)">+</button>
+      </div>
+    </div>
+<div class="counter active" id="counter_Eutypiose" data-cat="Eutypiose">
+      <div class="counter-title">Eutypiose</div>
+      <div class="counter-row">
+        <button class="minus" type="button" onclick="changeCount('Eutypiose', -1)">−</button>
+        <div class="value" id="value_Eutypiose">0</div>
+        <button type="button" onclick="changeCount('Eutypiose', 1)">+</button>
+      </div>
+    </div>
+<div class="counter active" id="counter_Court_noue" data-cat="Court_noué">
+      <div class="counter-title">Court_noué</div>
+      <div class="counter-row">
+        <button class="minus" type="button" onclick="changeCount('Court_noue', -1)">−</button>
+        <div class="value" id="value_Court_noue">0</div>
+        <button type="button" onclick="changeCount('Court_noue', 1)">+</button>
+      </div>
+    </div>
+<div class="counter active" id="counter_Cepages_differents" data-cat="Cépages_différents">
+      <div class="counter-title">Cépages_différents</div>
+      <div class="counter-row">
+        <button class="minus" type="button" onclick="changeCount('Cepages_differents', -1)">−</button>
+        <div class="value" id="value_Cepages_differents">0</div>
+        <button type="button" onclick="changeCount('Cepages_differents', 1)">+</button>
+      </div>
+    </div>
+</div>
+
+<div class="card">
+  <label for="commentaire">Commentaire</label>
+  <textarea id="commentaire" placeholder="Optionnel"></textarea>
+</div>
+
+<div class="card">
+  <label>Sauvegarde automatique</label>
+  <div class="small" id="autosaveStatus">État en cours sauvegardé sur cet appareil.</div>
+  <div class="small">Même si tu fermes l’application, les compteurs en cours et les parcelles déjà enregistrées sont conservés localement.</div>
+</div>
+
+<div class="card">
+  <label>Comptages enregistrés</label>
+  <div class="small" id="savedSummary">Aucun comptage enregistré.</div>
+  <div class="saved-list" id="savedList"></div>
+  <div class="saved-actions">
+    <button type="button" class="info" onclick="deleteLastRecord()">Supprimer le dernier</button>
+    <button type="button" class="danger-small" onclick="clearAllRecords()">Tout effacer</button>
+  </div>
+</div>
+
+<div class="actions">
+  <button type="button" class="save" onclick="saveCurrentRecord()">Enregistrer cette parcelle</button>
+  <button type="button" class="export" onclick="exportCSV()">Exporter CSV complet</button>
+  <button type="button" class="reset" onclick="resetCounts()">Remettre à zéro</button>
+</div>
+
+<script>
+const categories = [
+{id:"Manquants", name:"Manquants"},
+{id:"Complants", name:"Complants"},
+{id:"Manchots", name:"Manchots"},
+{id:"Manchots_avec_pampres_pied_en_reconstruction", name:"Manchots avec pampres (pied en reconstruction)"},
+{id:"Peu_productif", name:"Peu_productif"},
+{id:"Improductif", name:"Improductif"},
+{id:"Esca", name:"Esca"},
+{id:"Eutypiose", name:"Eutypiose"},
+{id:"Court_noue", name:"Court_noué"},
+{id:"Cepages_differents", name:"Cépages_différents"}
+];
+
+const STORAGE_KEY = "comptage_vigne_enregistrements_v2";
+const DRAFT_KEY = "comptage_vigne_brouillon_en_cours_v1";
+const counts = Object.fromEntries(categories.map(c => [c.id, 0]));
+let savedRecords = loadRecords();
+
+function changeCount(id, delta) {
+  counts[id] = Math.max(0, (counts[id] || 0) + delta);
+  document.getElementById("value_" + id).textContent = counts[id];
+  saveDraft();
+}
+
+function toggleCounter(id, visible) {
+  const el = document.getElementById("counter_" + id);
+  if (!el) return;
+  if (visible) el.classList.add("active");
+  else el.classList.remove("active");
+}
+
+function showAllCounters() {
+  document.querySelectorAll(".cat-check").forEach(cb => cb.checked = true);
+  categories.forEach(c => toggleCounter(c.id, true));
+}
+
+function resetCounts() {
+  if (!confirm("Remettre les compteurs affichés à zéro ? Les parcelles déjà enregistrées seront conservées.")) return;
+  resetFormOnly();
+}
+
+function resetFormOnly() {
+  categories.forEach(c => {
+    counts[c.id] = 0;
+    document.getElementById("value_" + c.id).textContent = 0;
+  });
+  document.getElementById("rang").value = "";
+  document.getElementById("commentaire").value = "";
+  clearDraft();
+}
+
+function saveDraft() {
+  const draft = {
+    parcelle: document.getElementById("parcelle")?.value || "",
+    rang: document.getElementById("rang")?.value || "",
+    commentaire: document.getElementById("commentaire")?.value || "",
+    counts: Object.fromEntries(categories.map(c => [c.id, counts[c.id] || 0])),
+    savedAt: new Date().toISOString()
+  };
+  localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+  updateAutosaveStatus(draft.savedAt);
+}
+
+function loadDraft() {
+  try {
+    const draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null");
+    if (!draft) return;
+
+    if (draft.parcelle && document.getElementById("parcelle")) {
+      document.getElementById("parcelle").value = draft.parcelle;
+    }
+    document.getElementById("rang").value = draft.rang || "";
+    document.getElementById("commentaire").value = draft.commentaire || "";
+
+    categories.forEach(c => {
+      counts[c.id] = Math.max(0, Number(draft.counts?.[c.id] || 0));
+      document.getElementById("value_" + c.id).textContent = counts[c.id];
+    });
+    updateAutosaveStatus(draft.savedAt);
+  } catch(e) {
+    console.warn("Brouillon non lisible", e);
+  }
+}
+
+function clearDraft() {
+  localStorage.removeItem(DRAFT_KEY);
+  updateAutosaveStatus(null);
+}
+
+function updateAutosaveStatus(savedAt) {
+  const el = document.getElementById("autosaveStatus");
+  if (!el) return;
+  if (!savedAt) {
+    el.textContent = "Aucun comptage en cours. Les parcelles enregistrées restent conservées.";
+    return;
+  }
+  const d = new Date(savedAt);
+  el.textContent = "Dernière sauvegarde automatique : " + d.toLocaleDateString("fr-FR") + " à " + d.toLocaleTimeString("fr-FR");
+}
+
+function loadRecords() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+  } catch(e) {
+    return [];
+  }
+}
+
+function saveRecords() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(savedRecords));
+  renderSavedRecords();
+}
+
+function getNowParts() {
+  const now = new Date();
+  return {
+    dateISO: now.toISOString().slice(0,10),
+    heure: now.toTimeString().slice(0,8),
+    timestamp: now.toISOString()
+  };
+}
+
+function saveCurrentRecord() {
+  const total = categories.reduce((sum, c) => sum + (counts[c.id] || 0), 0);
+  if (total === 0 && !confirm("Tous les compteurs sont à zéro. Enregistrer quand même cette parcelle ?")) return;
+
+  const now = getNowParts();
+  const record = {
+    id: now.timestamp + "_" + Math.random().toString(16).slice(2),
+    Date: now.dateISO,
+    Heure: now.heure,
+    ID_parcelle: document.getElementById("parcelle").value,
+    Rang_ou_secteur: document.getElementById("rang").value,
+    Commentaire: document.getElementById("commentaire").value,
+    valeurs: Object.fromEntries(categories.map(c => [c.name, counts[c.id] || 0]))
+  };
+
+  savedRecords.push(record);
+  saveRecords();
+  resetFormOnly();
+  alert("Parcelle enregistrée. Tu peux passer à la suivante.");
+}
+
+function deleteLastRecord() {
+  if (savedRecords.length === 0) return alert("Aucun comptage enregistré.");
+  const last = savedRecords[savedRecords.length - 1];
+  if (!confirm("Supprimer le dernier comptage enregistré : " + last.ID_parcelle + " ?")) return;
+  savedRecords.pop();
+  saveRecords();
+}
+
+function clearAllRecords() {
+  if (savedRecords.length === 0) return alert("Aucun comptage enregistré.");
+  if (!confirm("Effacer définitivement tous les comptages enregistrés sur cet appareil ?")) return;
+  savedRecords = [];
+  saveRecords();
+}
+
+function renderSavedRecords() {
+  const summary = document.getElementById("savedSummary");
+  const list = document.getElementById("savedList");
+  if (!summary || !list) return;
+
+  summary.textContent = savedRecords.length === 0
+    ? "Aucun comptage enregistré."
+    : savedRecords.length + " comptage(s) enregistré(s) sur cet appareil.";
+
+  if (savedRecords.length === 0) {
+    list.innerHTML = "";
+    return;
+  }
+
+  const recent = savedRecords.slice(-12).reverse();
+  list.innerHTML = recent.map(r => {
+    const total = categories.reduce((sum, c) => sum + Number(r.valeurs?.[c.name] || 0), 0);
+    return `<div class="saved-item"><strong>${escapeHtml(r.ID_parcelle)}</strong><br>${escapeHtml(r.Date)} ${escapeHtml(r.Heure)} — ${escapeHtml(r.Rang_ou_secteur || "sans rang/secteur")}<br>Total compté : ${total}</div>`;
+  }).join("");
+}
+
+function escapeHtml(s) {
+  return String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function csvEscape(v) {
+  const s = String(v ?? "");
+  return '"' + s.replace(/"/g, '""') + '"';
+}
+
+function exportCSV() {
+  if (savedRecords.length === 0) {
+    alert("Aucun comptage enregistré. Clique d'abord sur 'Enregistrer cette parcelle'.");
+    return;
+  }
+
+  const headers = ["Date","Heure","ID_parcelle","Rang_ou_secteur", ...categories.map(c => c.name), "Commentaire"];
+  const rows = savedRecords.map(r => [
+    r.Date,
+    r.Heure,
+    r.ID_parcelle,
+    r.Rang_ou_secteur,
+    ...categories.map(c => r.valeurs?.[c.name] ?? 0),
+    r.Commentaire
+  ]);
+
+  const csv = headers.map(csvEscape).join(";") + "\n" + rows.map(row => row.map(csvEscape).join(";")).join("\n") + "\n";
+  const blob = new Blob(["\ufeff" + csv], {type:"text/csv;charset=utf-8;"});
+  const url = URL.createObjectURL(blob);
+
+  const today = new Date().toISOString().slice(0,10);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "comptage_vigne_complet_" + today + ".csv";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+document.getElementById("parcelle").addEventListener("change", saveDraft);
+document.getElementById("rang").addEventListener("input", saveDraft);
+document.getElementById("commentaire").addEventListener("input", saveDraft);
+window.addEventListener("pagehide", saveDraft);
+
+loadDraft();
+renderSavedRecords();
+</script>
+</body>
+</html>
